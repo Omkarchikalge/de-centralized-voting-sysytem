@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DecentralVote - Blockchain Voting System</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.1/ethers.umd.min.js"></script>
+        <!-- add this line inside <head> (below ethers script) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="floating-particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+
+    <!-- Theme Toggle -->
+    <div class="theme-toggle" id="themeToggle">
+        <div class="toggle-switch">
+            <div class="toggle-slider"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>DecentralVote</h1>
+            <p>Blockchain-Powered • Transparent • Immutable • Secure</p>
+            <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px; margin-top: 20px;">
+                <strong>🔐 Security Features:</strong> Multi-Signature Auth • Vote Encryption • Biometric Verification •
+                Smart Contracts
+            </div>
+        </div>
+
+        <!-- Wallet Connection -->
+        <div class="card wallet-section">
+            <div style="margin-bottom: 15px;">
+                <h3 style="color: #77d4d1; margin-bottom: 20px;">🔐 Secure Authentication</h3>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
+                    <button id="connectWallet" class="connect-btn">Connect Wallet</button>
+                    <button id="biometricAuth" class="connect-btn"
+                        style="background: linear-gradient(135deg, #040404 40%, #a855f7 75%,);">Biometric Auth</button>
+                    <button id="twoFactorAuth" class="connect-btn"
+                        style="background: linear-gradient(120deg, #5a68c6 10%, #040404 65%);">2FA Verify</button>
+                    <button id="loadDemoData" class="connect-btn"
+                        style="background: linear-gradient(135deg, #040404 40%, #a855f7 75%,);">🎲 Load Demo Data</button>
+                    </div>
+            </div>
+            <div id="walletInfo" class="wallet-info hidden">
+                <div
+                    style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                    <div style="color: bisque;"><strong>Connected:</strong> <span id="walletAddress"></span></div>
+                    <div style="display: flex; gap: 10px;">
+                        <span id="authStatus"
+                            style="background: #28a745; color: white; padding: 4px 8px; border-radius: 12px; font-size: 0.8em;">✓
+                            Multi-Auth Verified</span>
+                        <span
+                            style="background: #17a2b8; color: white; padding: 4px 8px; border-radius: 12px; font-size: 0.8em;">🔐
+                            Encrypted</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Dashboard -->
+        <div class="card">
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <h3 id="totalElections">0</h3>
+                    <p>Smart Contracts</p>
+                </div>
+                <div class="stat-item">
+                    <h3 id="totalVotes">0</h3>
+                    <p>Encrypted Votes</p>
+                </div>
+                <div class="stat-item">
+                    <h3 id="activeElections">0</h3>
+                    <p>Active Elections</p>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-title" style="color: bisque;">Blockchain Status</div>
+                    <div id="blockchainStatus">🔴 Offline</div>
+                </div>
+
+            </div>
+            <div style="background: #1f1f1f; padding: 15px; border-radius: 18px;border-width: 4px;border-color: #17a2b8; border-style: double; margin-top: 15px;">
+                <strong style="color: bisque;">🔗 Blockchain Features:</strong>
+                <div
+                    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-top: 10px; font-size: 1em;color: antiquewhite;">
+                    <span>✓ Immutable Records</span>
+                    <span>✓ Smart Contract Automation</span> 
+                    <span>✓ Distributed Ledger</span>
+                    <span>✓ Zero-Knowledge Proofs</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2 id="sec" style="text-align: center; text-shadow: #f8f6f6; color: antiquewhite;">Election Section</h2>
+            <div style="text-align:center; margin-top:40px;">
+                <a href="admin.html" class="connect-btn" style="margin-right:15px;">Admin Panel</a>
+                <a href="voter.html" class="connect-btn">Voter Section</a>
+            </div>
+        </div>
+
+
+        <!-- Create Election -->
+        <div class="card">
+            <h2 class="section-title">Create New Election</h2>
+            <form id="createElectionForm">
+                <div class="form-group" style="border-radius: 18px;">
+                    <label for="electionTitle">Election Title</label>
+                    <input type="text" id="electionTitle" placeholder="e.g., Student Council President 2025" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="electionDescription">Description</label>
+                    <textarea id="electionDescription" style="border-radius: 18px;" rows="3" placeholder="Brief description of the election..."
+                        required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label style="border-radius: 18px;">Candidates</label>
+                    <div id="candidatesContainer" class="candidate-inputs" style="border-radius: 18px;">
+                        <div class="candidate-input" style="border-radius: 18px;">
+                            <input type="text" placeholder="Candidate Name" required>
+                            <button type="button" class="remove-btn" onclick="removeCandidate(this)">Remove</button>
+                        </div>
+                        <div class="candidate-input">
+                            <input type="text" placeholder="Candidate Name" required>
+                            <button type="button" class="remove-btn" onclick="removeCandidate(this)">Remove</button>
+                        </div>
+                    </div>
+                    <button type="button" class="add-btn" onclick="addCandidate()">+ Add Candidate</button>
+                </div>
+
+                <button type="submit" class="primary-btn" id="createElectionBtn">Create Election</button>
+            </form>
+        </div>
+
+        <!-- Elections List -->
+        <div class="card">
+            <h2 class="section-title">Active Elections</h2>
+            <div id="electionsContainer" class="elections-grid">
+                <!-- Elections will be populated here -->
+            </div>
+        </div>
+        
+        <!-- Voter Receipt Modal -->
+        <div id="receiptModal" class="modal hidden">
+            <div class="modal-content">
+                <h2>✅ Vote Confirmation</h2>
+                <p><strong>Election:</strong> <span id="receiptElection"></span></p>
+                <p><strong>Voted For:</strong> <span id="receiptCandidate"></span></p>
+                <p><strong>Date:</strong> <span id="receiptDate"></span></p>
+                <p><strong>Transaction Hash:</strong> <span id="receiptTxHash" style="font-family: monospace;"></span></p>
+                <div style="margin-top: 15px;">
+                    <button id="downloadReceipt" class="primary-btn">📄 Download Receipt</button>
+                    <button id="closeReceipt" class="secondary-btn">❌ Close</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <div class="footer-content">
+                <h3>🚀 Powered by Blockchain Technology</h3>
+                <p>Secure • Transparent • Immutable • Democratic</p>
+                <div class="footer-icons">
+                    <div class="footer-icon">🔐</div>
+                    <div class="footer-icon">⚡</div>
+                    <div class="footer-icon">🌐</div>
+                    <div class="footer-icon">💎</div>
+                </div>
+                <p style="margin-top: 20px; font-size: 0.9em; opacity: 0.8;">
+                    Built with ❤️ for Democracy | © 2025 DecentralVote
+                </p>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Notification System -->
+    <div id="notification" class="notification"></div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>
